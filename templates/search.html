@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search PPR</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>Search for PPR</h1>
+
+    <form method="POST">
+        <input type="text" name="search_input" placeholder="Enter a name or CIN" required>
+        <input type="submit" value="Search">
+    </form>
+
+    <br>
+    <a href="{{ url_for('admin_upload') }}">Upload a different Excel file</a>
+
+    {% if result %}
+        {% if result == "No match found." %}
+            <p>No match found.</p>
+        {% else %}
+            <h2>Results:</h2>
+            <ul>
+            {% for row in result %}
+                <li>{{ row['Name'] }} | CIN: {{ row['CIN'] }} | PPR: {{ row['PPR'] }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endif %}
+</body>
+</html>
