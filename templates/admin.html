@@ -5,6 +5,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <header>
+    <nav>
+        <a href="/admin">Admin</a>
+        <a href="/search">Search</a>
+        <a href="/logout">Logout</a>
+      </nav>
+    </header>
+    
     <h1>Admin Panel - Upload Excel Files</h1>
 
     <form method="POST" enctype="multipart/form-data">
@@ -20,7 +28,9 @@
     <h2>Uploaded Files:</h2>
     <ul>
         {% for file in files %}
-            <li>{{ file }}</li>
+            <li>
+                {{ file.filename }} (Uploaded: {{ file.upload_date.strftime('%Y-%m-%d %H:%M') }}, By: {{ file.uploader.username }})
+            </li>
         {% else %}
             <li>No files uploaded yet.</li>
         {% endfor %}

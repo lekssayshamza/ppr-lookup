@@ -1,3 +1,35 @@
+header {
+  width: 100%;
+  background-color: #f7f9fc;
+  padding: 10px 0;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #007BFF;
+}
+
+header nav {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  font-family: Arial, sans-serif;
+}
+
+header nav a {
+  color: #007BFF;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+header nav a:hover {
+  background-color: #007BFF;
+  color: white;
+  text-decoration: none;
+}
+
 body {
     font-family: Arial, sans-serif;
     background-color: #f7f9fc;

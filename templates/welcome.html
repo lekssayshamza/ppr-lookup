@@ -1,19 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Welcome</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome.css') }}">
 </head>
 <body>
-  <h1>Welcome!</h1>
-  {% if current_user.is_authenticated %}
-    <p>Hello, {{ current_user.id }}!</p>
-    <a href="{{ url_for('admin_upload') }}">Go to Admin Panel</a><br>
-    <a href="{{ url_for('search_ppr') }}">Go to Search Page</a><br>
-    <a href="{{ url_for('logout') }}">Logout</a>
-  {% else %}
-    <a href="{{ url_for('login') }}">Login</a>
-    <a href="{{ url_for('register') }}">Register</a>
-  {% endif %}
+
+  <main>
+    <h1>Welcome!</h1>
+
+    {% if current_user.is_authenticated %}
+      <p>Hello, <strong>{{ current_user.username }}</strong>!</p>
+
+      <nav>
+        <a href="{{ url_for('admin_upload') }}" class="btn">Admin Panel</a>
+        <a href="{{ url_for('search_ppr') }}" class="btn">Search Page</a>
+        <a href="{{ url_for('logout') }}" class="btn btn-logout">Logout</a>
+      </nav>
+
+    {% else %}
+      <nav>
+        <a href="{{ url_for('login') }}" class="btn">Login</a>
+        <a href="{{ url_for('register') }}" class="btn">Register</a>
+      </nav>
+    {% endif %}
+
+  </main>
+
 </body>
 </html>
