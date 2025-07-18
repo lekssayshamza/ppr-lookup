@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, UTC
+from sqlalchemy import text
 
 app = Flask(__name__)
 app.secret_key = 'secret_key'
@@ -71,12 +72,26 @@ def login():
     if request.method == 'POST':
         u = request.form['username'].strip()
         p = request.form['password'].strip()
+
+        # SAFE
         user = User.query.filter_by(username=u).first()
         if user and check_password_hash(user.password_hash, p):
             login_user(user)
             flash('Logged in successfully.', 'success')
             return redirect(url_for('welcome'))
         flash('Invalid credentials', 'error')
+
+        # Vulnerable raw query — unsafe!
+        # query = text("SELECT * FROM user WHERE username = '" + u + "'")
+        # result = db.session.execute(query).mappings().fetchone()
+
+        # if result is not None and check_password_hash(result['password_hash'], p):
+        #     user = User.query.get(result['id'])
+        #     login_user(user)
+        #     flash('Logged in successfully.', 'success')
+        #     return redirect(url_for('welcome'))
+        # flash('Invalid credentials', 'error')
+
     return render_template('login.html')
 
 @app.route('/logout')
@@ -163,6 +178,27 @@ def search_ppr():
             flash(f'Error during search: {e}', 'error')
             return redirect(url_for('search_ppr'))
     return render_template('search.html', result=result)
+
+VALID_FLAGS = {
+    "FLAG{source_code}",
+    "FLAG{admin_secret_flag}",
+    # 
+}
+
+@app.route('/submit_flag', methods=['GET', 'POST'])
+@login_required
+def submit_flag():
+    if request.method == 'POST':
+        flag = request.form.get('flag', '').strip()
+        if not flag:
+            flash("Please enter a flag before submitting.", "error")
+        elif flag in VALID_FLAGS:
+            flash("Congratulations! You submitted a valid flag.", "success")
+        else:
+            flash("Invalid flag, please try again.", "error")
+        return redirect(url_for('submit_flag'))
+
+    return render_template('submit_flag.html')
 
 if __name__ == '__main__':
     with app.app_context():

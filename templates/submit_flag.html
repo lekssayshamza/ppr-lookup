@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Submit a Flag</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome.css') }}">
+</head>
+<body>
+
+  <main>
+    <h1>Submit a Flag</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('submit_flag') }}" method="POST" class="flag-submit-form">
+      <label for="flag">Enter the flag you found: "They are 5 Flags"</label><br>
+      <input type="text" id="flag" name="flag" placeholder="FLAG{...}" required>
+      <button type="submit">Submit Flag</button>
+    </form>
+
+    <nav>
+      <a href="{{ url_for('welcome') }}" class="btn">Back to Home</a>
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('logout') }}" class="btn btn-logout">Logout</a>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="btn">Login</a>
+      {% endif %}
+    </nav>
+  </main>
+
+</body>
+</html>
