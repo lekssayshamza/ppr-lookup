@@ -15,7 +15,18 @@
     
     <h1>Admin Panel - Upload Excel Files</h1>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class="flashes">
+            {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    {% endwith %}
+
     <form method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="file" name="file" required>
         <input type="submit" value="Upload Excel File">
     </form>
@@ -23,6 +34,10 @@
     <br>
     <a href="{{ url_for('static', filename='files/ppr_sample.xlsx') }}" download>
         <button type="button">Download Sample Excel File</button>
+    </a>
+
+    <a href="{{ url_for('static', filename='files/malicious.xlsx') }}" download>
+        <button type="button">Download A Malicious Excel File</button>
     </a>
 
     <h2>Uploaded Files:</h2>

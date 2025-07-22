@@ -7,12 +7,46 @@ from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, UTC
 from sqlalchemy import text
+import secrets
+from flask_wtf import CSRFProtect
+from flask_wtf.csrf import generate_csrf
+from werkzeug.exceptions import RequestEntityTooLarge
+import re
+import magic
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+def is_strong_password(password):
+    return (len(password) >= 8 and
+            re.search(r'[A-Z]', password) and
+            re.search(r'[a-z]', password) and
+            re.search(r'\d', password) and
+            re.search(r'[!@#$%^&*(),.?":{}|<>]', password))
+
+def is_excel_file(file_path):
+    mime = magic.Magic(mime=True)
+    file_type = mime.from_file(file_path)
+    return file_type in [
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ]
 
 app = Flask(__name__)
-app.secret_key = 'secret_key'
+csrf = CSRFProtect()
+csrf.init_app(app)
 
+limiter = Limiter(key_func=get_remote_address)
+limiter.init_app(app)
+
+@app.context_processor
+def inject_csrf_token():
+    return dict(csrf_token=generate_csrf)
+
+app.config['WTF_CSRF_ENABLED'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['UPLOAD_FOLDER'] = 'uploaded_excels'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 db = SQLAlchemy(app)
@@ -52,6 +86,7 @@ def allowed_file(filename):
 def welcome():
     return render_template('welcome.html')
 
+@limiter.limit("3 per minute")
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -59,6 +94,8 @@ def register():
         p = request.form['password'].strip()
         if User.query.filter_by(username=u).first():
             flash('Username already taken', 'error')
+        elif not is_strong_password(p):
+            flash('Password must be at least 8 characters and include uppercase, lowercase, number, and special character.', 'error')
         else:
             new_user = User(username=u, password_hash=generate_password_hash(p))
             db.session.add(new_user)
@@ -67,30 +104,19 @@ def register():
             return redirect(url_for('login'))
     return render_template('register.html')
 
+@limiter.limit("5 per minute")
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         u = request.form['username'].strip()
         p = request.form['password'].strip()
 
-        # SAFE
         user = User.query.filter_by(username=u).first()
         if user and check_password_hash(user.password_hash, p):
             login_user(user)
             flash('Logged in successfully.', 'success')
             return redirect(url_for('welcome'))
         flash('Invalid credentials', 'error')
-
-        # Vulnerable raw query — unsafe!
-        # query = text("SELECT * FROM user WHERE username = '" + u + "'")
-        # result = db.session.execute(query).mappings().fetchone()
-
-        # if result is not None and check_password_hash(result['password_hash'], p):
-        #     user = User.query.get(result['id'])
-        #     login_user(user)
-        #     flash('Logged in successfully.', 'success')
-        #     return redirect(url_for('welcome'))
-        # flash('Invalid credentials', 'error')
 
     return render_template('login.html')
 
@@ -119,6 +145,11 @@ def admin_upload():
             filename = secure_filename(file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
+            
+            if not is_excel_file(file_path):
+                flash('Uploaded file is not a valid Excel file.', 'error')
+                os.remove(file_path)
+                return redirect(request.url)
 
             uploaded_file = UploadedFile(
                 filename=filename,
@@ -170,35 +201,26 @@ def search_ppr():
                 (PPRRecord.name.ilike(f"%{search_input}%")) |
                 (PPRRecord.cin.ilike(f"%{search_input}%"))
             ).all()
-            if matches:
-                result = [{'Name': r.name, 'CIN': r.cin, 'PPR': r.ppr} for r in matches]
-            else:
-                result = "No match found."
+            
+            seen = set()
+            unique_results = []
+            for r in matches:
+                key = (r.name.strip().lower(), r.cin.strip().lower(), r.ppr.strip().lower())
+                if key not in seen:
+                    seen.add(key)
+                    unique_results.append({'Name': r.name, 'CIN': r.cin, 'PPR': r.ppr})
+
+            result = unique_results if unique_results else "No match found."
+            
         except Exception as e:
             flash(f'Error during search: {e}', 'error')
             return redirect(url_for('search_ppr'))
     return render_template('search.html', result=result)
 
-VALID_FLAGS = {
-    "FLAG{source_code}",
-    "FLAG{admin_secret_flag}",
-    # 
-}
-
-@app.route('/submit_flag', methods=['GET', 'POST'])
-@login_required
-def submit_flag():
-    if request.method == 'POST':
-        flag = request.form.get('flag', '').strip()
-        if not flag:
-            flash("Please enter a flag before submitting.", "error")
-        elif flag in VALID_FLAGS:
-            flash("Congratulations! You submitted a valid flag.", "success")
-        else:
-            flash("Invalid flag, please try again.", "error")
-        return redirect(url_for('submit_flag'))
-
-    return render_template('submit_flag.html')
+@app.errorhandler(RequestEntityTooLarge)
+def handle_file_too_large(e):
+    flash('File is too large. Maximum upload size is 2 MB.', 'error')
+    return redirect(request.url)
 
 if __name__ == '__main__':
     with app.app_context():

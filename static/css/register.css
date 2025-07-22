@@ -61,3 +61,19 @@ a {
 a:hover {
     text-decoration: underline;
 }
+
+.flashes { 
+    list-style-type: none; padding: 0; 
+}
+
+.success { 
+    color: green; 
+}
+
+.error { 
+    color: red; 
+}
+
+.info { 
+    color: blue; 
+}

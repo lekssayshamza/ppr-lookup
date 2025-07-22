@@ -14,14 +14,6 @@
     {% if current_user.is_authenticated %}
       <p>Hello, <strong>{{ current_user.username }}</strong>!</p>
 
-    {% if current_user.is_authenticated and current_user.username == 'admin' %}
-      <div class="flag">
-        FLAG{admin_secret_flag}
-      </div>
-    {% endif %}
-
-      <!-- FLAG{source_code} -->
-
       <nav>
         <a href="{{ url_for('admin_upload') }}" class="btn">Admin Panel</a>
         <a href="{{ url_for('search_ppr') }}" class="btn">Search Page</a>
@@ -29,8 +21,6 @@
       </nav>
 
     {% else %}
-
-      <!-- FLAG{source_code} -->
 
       <nav>
         <a href="{{ url_for('login') }}" class="btn">Login</a>
