@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Excel File</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+    <nav>
+        <a href="/admin">Admin</a>
+        <a href="/search">Search</a>
+        <a href="/logout">Logout</a>
+      </nav>
+    </header>
+    
+    <h1>Upload Excel File Containing PPR Data</h1>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul style="color: red;">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" enctype="multipart/form-data">
+      <input type="file" name="file" required>
+      <input type="submit" value="Upload">
+    </form>
+
+    <br>
+    <a href="{{ url_for('static', filename='files/ppr_sample.xlsx') }}" download>
+        <button type="button">Download Sample Excel File</button>
+    </a>
+</body>
+</html>

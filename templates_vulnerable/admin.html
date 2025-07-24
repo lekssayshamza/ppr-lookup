@@ -26,7 +26,6 @@
     {% endwith %}
 
     <form method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="file" name="file" required>
         <input type="submit" value="Upload Excel File">
     </form>
@@ -38,6 +37,10 @@
 
     <a href="{{ url_for('static', filename='files/malicious.xlsx') }}" download>
         <button type="button">Download A Malicious Excel File</button>
+    </a>
+
+    <a href="{{ url_for('static', filename='files/3mb.xlsx') }}" download>
+        <button type="button">Download A 3 MB Excel File</button>
     </a>
 
     <h2>Uploaded Files:</h2>

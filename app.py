@@ -31,7 +31,7 @@ def is_excel_file(file_path):
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     ]
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates_secure')
 csrf = CSRFProtect()
 csrf.init_app(app)
 
