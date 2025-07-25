@@ -1,0 +1,15 @@
+admin
+administrator
+user
+test
+guest
+root
+info
+adm
+mysql
+user1
+administrator1
+sysadmin
+operator
+support
+aziz
