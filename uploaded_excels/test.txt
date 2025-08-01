@@ -1,2 +1,0 @@
-This is a sample text file used for upload testing.
-It contains plain text data only.
