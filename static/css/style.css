@@ -119,3 +119,8 @@ ul[style="color: red;"] {
     margin-bottom: 20px;
     font-weight: bold;
 }
+
+.button-group {
+  display: flex;
+  gap: 10px;
+}

@@ -77,3 +77,10 @@ a:hover {
 .info { 
     color: blue; 
 }
+
+.flash-messages,
+ul[style="color: red;"] {
+    color: #d9534f;
+    margin-bottom: 20px;
+    font-weight: bold;
+}

@@ -32,17 +32,19 @@
     </form>
 
     <br>
-    <a href="{{ url_for('static', filename='files/ppr_sample.xlsx') }}" download>
-        <button type="button">Download Sample Excel File</button>
-    </a>
+    <div class="button-group">
+        <a href="{{ url_for('static', filename='files/ppr_sample.xlsx') }}" download>
+            <button type="button">Download Sample Excel File</button>
+        </a>
 
-    <a href="{{ url_for('static', filename='files/malicious.xlsx') }}" download>
-        <button type="button">Download A Malicious Excel File</button>
-    </a>
+        <a href="{{ url_for('static', filename='files/malicious.xlsx') }}" download>
+            <button type="button">Download A Malicious Excel File</button>
+        </a>
 
-    <a href="{{ url_for('static', filename='files/3mb.xlsx') }}" download>
-        <button type="button">Download A 3 MB Excel File</button>
-    </a>
+        <a href="{{ url_for('static', filename='files/3mb.xlsx') }}" download>
+            <button type="button">Download A 3 MB Excel File</button>
+        </a>
+    </div>
 
     <h2>Uploaded Files:</h2>
     <ul>
