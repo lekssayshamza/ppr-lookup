@@ -6,7 +6,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, UTC
-from sqlalchemy import text
 import secrets
 from flask_wtf import CSRFProtect
 from flask_wtf.csrf import generate_csrf
